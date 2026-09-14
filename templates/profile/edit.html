@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Profilni Tahrirlash - G'ulomte Mahalla{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Profilni Tahrirlash</h1>
+            <p class="text-xs text-gray-500">Username va to'liq ismingizni yangilang</p>
+        </div>
+        <a href="/profile/" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition inline-flex items-center space-x-1.5">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Orqaga</span>
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl border border-gray-200/80 shadow-xs p-6 sm:p-8">
+        
+        <form id="edit-profile-form" class="space-y-6">
+            
+            <!-- Full Name -->
+            <div>
+                <label for="edit-fullname" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                    To'liq Ismingiz (Full Name)
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-user-gear text-sm"></i>
+                    </div>
+                    <input type="text" id="edit-fullname" name="full_name" required
+                        placeholder="Masalan: Alisher Navoiy"
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <!-- Username -->
+            <div>
+                <label for="edit-username" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                    Foydalanuvchi Nomi (Username)
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-at text-sm"></i>
+                    </div>
+                    <input type="text" id="edit-username" name="username" required
+                        placeholder="username"
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                </div>
+            </div>
+
+            <!-- Error Box -->
+            <div id="profile-error" class="hidden p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-medium"></div>
+
+            <!-- Submit Controls -->
+            <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
+                <a href="/profile/" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition">
+                    Bekor qilish
+                </a>
+                <button type="submit" id="save-profile-btn" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center space-x-2">
+                    <span id="btn-text">Saqlash</span>
+                    <i id="btn-spinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const fullnameInput = document.getElementById('edit-fullname');
+    const usernameInput = document.getElementById('edit-username');
+    const form = document.getElementById('edit-profile-form');
+    const saveBtn = document.getElementById('save-profile-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const errorBox = document.getElementById('profile-error');
+
+    // Populate current data
+    try {
+        const user = await API.getMe();
+        if (user) {
+            fullnameInput.value = user.full_name || '';
+            usernameInput.value = user.username || '';
+        }
+    } catch (e) {
+        console.error('Failed to load profile data:', e);
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        errorBox.classList.add('hidden');
+        btnText.textContent = 'Saqlanmoqda...';
+        btnSpinner.classList.remove('hidden');
+        saveBtn.disabled = true;
+
+        const data = {
+            full_name: fullnameInput.value.trim(),
+            username: usernameInput.value.trim(),
+        };
+
+        try {
+            await API.updateMe(data);
+            Toast.success("Profil ma'lumotlari muvaffaqiyatli saqlandi!");
+            setTimeout(() => {
+                window.location.href = '/profile/';
+            }, 600);
+        } catch (err) {
+            errorBox.textContent = err.message || 'Xatolik yuz berdi!';
+            errorBox.classList.remove('hidden');
+            btnText.textContent = 'Saqlash';
+            btnSpinner.classList.add('hidden');
+            saveBtn.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

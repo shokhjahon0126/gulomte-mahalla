@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Boshqaruv Paneli - G'ulomte Mahalla{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Welcome Hero Banner -->
+    <div class="relative bg-gradient-to-r from-indigo-900 via-indigo-800 to-blue-900 rounded-3xl p-6 sm:p-8 text-white overflow-hidden shadow-xl shadow-indigo-950/10">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold text-indigo-200">
+                    <i class="fa-solid fa-sparkles text-amber-400"></i>
+                    <span>Boshqaruv Paneli</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Xush kelibsiz, <span class="user-full-name text-indigo-300">Foydalanuvchi</span>!
+                </h1>
+                <p class="text-sm text-indigo-200/80 max-w-xl">
+                    G'ulomte Mahalla fuqarolar va ma'muriyat uchun yangiliklar va boshqaruv xizmatlari platformasi.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3">
+                <a href="/news/" class="px-4 py-2.5 bg-white text-indigo-900 hover:bg-indigo-50 font-bold text-sm rounded-xl transition shadow-md flex items-center space-x-2">
+                    <i class="fa-solid fa-newspaper"></i>
+                    <span>Yangiliklar</span>
+                </a>
+                <a href="/news/create/" class="admin-only hidden px-4 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-sm rounded-xl transition shadow-md shadow-indigo-500/30 flex items-center space-x-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Yangi Yangilik</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Business Metrics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        
+        <!-- Metric 1: News Count -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Jami Yangiliklar</p>
+                    <h3 id="metric-news-count" class="text-2xl font-bold text-gray-900 mt-1">...</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-newspaper"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-emerald-600 font-medium">
+                <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i>
+                <span>Faol va e'lon qilingan</span>
+            </div>
+        </div>
+
+        <!-- Metric 2: Account Status -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Hisob Holati</p>
+                    <h3 class="text-xl font-bold text-emerald-600 mt-1">Faol</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-500 font-medium">
+                <i class="fa-solid fa-shield-halved mr-1 text-[10px]"></i>
+                <span>Tizimga muvaffaqiyatli kirilgan</span>
+            </div>
+        </div>
+
+        <!-- Metric 3: Profile Info -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Profil Ma'lumotlari</p>
+                    <h3 class="text-lg font-bold text-gray-900 mt-1">Tasdiqlangan</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-indigo-600 font-medium">
+                <a href="/profile/" class="hover:underline flex items-center">
+                    <span>Profilni ko'rish</span>
+                    <i class="fa-solid fa-chevron-right ml-1 text-[10px]"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric 4: Current Date -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bugungi Sana</p>
+                    <h3 id="metric-current-date" class="text-xl font-bold text-gray-900 mt-1">...</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-500 font-medium">
+                <i class="fa-solid fa-clock mr-1 text-[10px]"></i>
+                <span>Mahalla yangilanishlari</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent News Table Card -->
+    <div class="bg-white rounded-3xl border border-gray-200/80 shadow-xs overflow-hidden">
+        
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900">So'nggi Yangiliklar</h2>
+                <p class="text-xs text-gray-500">Tizimga kiritilgan eng so'nggi ma'lumotlar va e'lonlar</p>
+            </div>
+            <a href="/news/" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                <span>Barchasini ko'rish</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+
+        <!-- News Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50/70 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <th class="py-3.5 px-6">Sarlavha</th>
+                        <th class="py-3.5 px-6">Qisqacha Ma'lumot</th>
+                        <th class="py-3.5 px-6">E'lon Qilingan Sana</th>
+                        <th class="py-3.5 px-6 text-right">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboard-news-tbody" class="divide-y divide-gray-100 text-sm">
+                    <!-- Skeleton Loader -->
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-gray-400">
+                            <i class="fa-solid fa-spinner fa-spin text-xl text-indigo-600 mb-2"></i>
+                            <p class="text-xs">Yangiliklar yuklanmoqda...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // Render Uzbek current short date (e.g., "14-sentabr")
+    const dateEl = document.getElementById('metric-current-date');
+    if (dateEl) {
+        dateEl.textContent = DateUtils.formatShortDate();
+    }
+
+    try {
+        const newsList = await API.news.getAll();
+        
+        // Update count metric
+        const countEl = document.getElementById('metric-news-count');
+        if (countEl) countEl.textContent = newsList.length;
+
+        // Render recent news (up to 5 items)
+        const tbody = document.getElementById('dashboard-news-tbody');
+        if (!tbody) return;
+
+        if (newsList.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="py-8 text-center text-gray-400">
+                        <i class="fa-solid fa-newspaper text-3xl mb-2 text-gray-300"></i>
+                        <p class="text-sm font-medium">Hozircha hech qanday yangilik kiritilmagan.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const recent = newsList.slice(0, 5);
+        tbody.innerHTML = recent.map(item => {
+            const dateStr = DateUtils.formatDateTime(item.created_at);
+            const shortDesc = item.description ? (item.description.length > 70 ? item.description.substring(0, 70) + '...' : item.description) : '';
+
+            return `
+                <tr class="hover:bg-gray-50/60 transition">
+                    <td class="py-4 px-6 font-bold text-gray-900 max-w-xs truncate">${escapeHtml(item.title)}</td>
+                    <td class="py-4 px-6 text-gray-600 max-w-xs truncate text-xs">${escapeHtml(shortDesc)}</td>
+                    <td class="py-4 px-6 text-xs text-gray-500">${dateStr}</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                        <a href="/news/${item.id}/" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition inline-flex items-center space-x-1">
+                            <i class="fa-solid fa-eye text-[11px]"></i>
+                            <span>Batafsil</span>
+                        </a>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error('Dashboard news load error:', err);
+    }
+});
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+}
+</script>
+{% endblock %}

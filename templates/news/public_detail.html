@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Yangilik - G'ulomte Mahalla Aholi Portali{% endblock %}
+
+{% block body %}
+<div class="min-h-full flex flex-col bg-gray-50/60">
+
+    {% include 'components/public_navbar.html' %}
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        <!-- Back Navigation -->
+        <div>
+            <a href="/public/news/" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold text-xs rounded-xl shadow-xs transition inline-flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Yangiliklar Ro'yxatiga Qaytish</span>
+            </a>
+        </div>
+
+        <!-- Article Card -->
+        <article class="bg-white rounded-3xl border border-gray-200/80 shadow-xs p-6 sm:p-10 space-y-6">
+            
+            <!-- Skeleton Spinner -->
+            <div id="public-detail-spinner" class="py-16 text-center text-gray-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-600 mb-3"></i>
+                <p class="text-sm font-medium">Yangilik ma'lumotlari yuklanmoqda...</p>
+            </div>
+
+            <!-- Content Container -->
+            <div id="public-detail-content" class="hidden space-y-6">
+                
+                <div class="space-y-3 pb-6 border-b border-gray-100">
+                    <div class="flex items-center space-x-3 text-xs text-indigo-600 font-semibold">
+                        <span class="px-2.5 py-1 bg-indigo-50 rounded-lg">Rasmiy Yangilik</span>
+                        <span id="public-article-date" class="text-gray-500 font-medium">...</span>
+                    </div>
+
+                    <h1 id="public-article-title" class="text-2xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
+                        ...
+                    </h1>
+                </div>
+
+                <!-- Article Body -->
+                <div id="public-article-body" class="text-gray-800 text-base sm:text-lg leading-relaxed whitespace-pre-line font-normal">
+                    ...
+                </div>
+
+            </div>
+
+        </article>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-6 bg-white border-t border-gray-200/80 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4">
+            &copy; 2026 G'ulomte Mahalla Aholi Portali. Barcha huquqlar himoyalangan.
+        </div>
+    </footer>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const newsId = pathParts[2]; // /public/news/<id>/
+
+    if (!newsId) {
+        window.location.href = '/public/news/';
+        return;
+    }
+
+    const spinner = document.getElementById('public-detail-spinner');
+    const content = document.getElementById('public-detail-content');
+
+    try {
+        const article = await API.news.getById(newsId);
+
+        if (spinner) spinner.classList.add('hidden');
+        if (content) content.classList.remove('hidden');
+
+        document.getElementById('public-article-title').textContent = article.title;
+        document.getElementById('public-article-body').textContent = article.description;
+
+        if (article.created_at) {
+            document.getElementById('public-article-date').textContent = DateUtils.formatDateTime(article.created_at);
+        }
+
+    } catch (err) {
+        Toast.error("Yangilik ma'lumotlarini yuklashda xatolik!");
+        setTimeout(() => {
+            window.location.href = '/public/news/';
+        }, 1500);
+    }
+});
+</script>
+{% endblock %}

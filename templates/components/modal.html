@@ -1,0 +1,58 @@
+<!-- Global Reusable Modal Container -->
+<div id="modal-container" class="fixed inset-0 z-50 hidden overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+    <div id="modal-box" class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300">
+        <!-- Modal Header -->
+        <div id="modal-header" class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 id="modal-title" class="text-lg font-bold text-gray-900">Modal Sarlavhasi</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <!-- Modal Body -->
+        <div id="modal-body" class="p-6">
+            <!-- Dynamic Content Injected Here -->
+        </div>
+        <!-- Modal Footer -->
+        <div id="modal-footer" class="flex items-center justify-end space-x-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition shadow-sm">Yopish</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(title, contentHtml, footerHtml = null) {
+    const modal = document.getElementById('modal-container');
+    const box = document.getElementById('modal-box');
+    const titleEl = document.getElementById('modal-title');
+    const bodyEl = document.getElementById('modal-body');
+    const footerEl = document.getElementById('modal-footer');
+
+    titleEl.textContent = title;
+    bodyEl.innerHTML = contentHtml;
+
+    if (footerHtml !== null) {
+        footerEl.innerHTML = footerHtml;
+        footerEl.classList.remove('hidden');
+    } else {
+        footerEl.classList.add('hidden');
+    }
+
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        box.classList.remove('scale-95');
+    });
+}
+
+function closeModal() {
+    const modal = document.getElementById('modal-container');
+    const box = document.getElementById('modal-box');
+    if (!modal) return;
+
+    modal.classList.add('opacity-0');
+    box.classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 200);
+}
+</script>

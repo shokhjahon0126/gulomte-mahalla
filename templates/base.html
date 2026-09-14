@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="uz" class="h-full bg-gray-50/50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}G'ulomte Mahalla - Boshqaruv Paneli{% endblock %}</title>
+
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full font-sans antialiased text-gray-900 flex flex-col bg-gray-50/60">
+
+    {% include 'components/alert.html' %}
+    {% include 'components/modal.html' %}
+
+    {% block body %}
+    <!-- Main App Layout with Navbar & Sidebar -->
+    <div class="min-h-full flex flex-col">
+
+        {% include 'components/navbar.html' %}
+
+        <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+            
+            {% include 'components/sidebar.html' %}
+
+            <!-- Page Content -->
+            <main class="flex-1 min-w-0">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-auto py-4 bg-white border-t border-gray-200/80 text-center text-xs text-gray-500">
+            <div class="max-w-7xl mx-auto px-4">
+                &copy; 2026 G'ulomte Mahalla boshqaruv tizimi. Barcha huquqlar himoyalangan.
+            </div>
+        </footer>
+    </div>
+    {% endblock %}
+
+    <!-- Static JavaScript Libraries -->
+    {% load static %}
+    <script src="{% static 'js/date-utils.js' %}"></script>
+    <script src="{% static 'js/api.js' %}"></script>
+    <script src="{% static 'js/alert.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
