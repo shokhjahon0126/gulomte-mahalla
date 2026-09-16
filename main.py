@@ -11,39 +11,20 @@ django.setup()
 
 from apps.news.models import TelegramChannel
 
-
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     id = update.message.chat.id
-
     if context.bot_data.get('id'):
         pass
-        # await update.message.reply_text("Siz login qilingansiz")
-
     else:
         bot = await TelegramChannel.objects.filter(
             username = update.message.chat.username
         ).afirst()
 
-        
         if bot:
-
             bot.chat_id
             bot.chat_id = update.message.chat.id
             await bot.asave(update_fields=['chat_id'])
             context.bot_data['id'] = True
-            
-
-            print(
-                update.message.chat.id,
-                update.message.chat.username
-            )
-            await update.message.reply_text('endi login qilindi!')
-        else:
-            await update.message.reply_text(
-                "Bu kanal bazada mavjud emas!"
-            )
-
-
 
 
 def main() -> None:

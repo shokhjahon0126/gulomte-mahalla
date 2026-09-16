@@ -5,18 +5,50 @@ from rest_framework.response import Response
 from telegram import Bot
 import asyncio
 from decouple import config
+from telegram.constants import ParseMode
 
 from .models import News,TelegramChannel
 from .serializers import NewsSerializer,TelegramChannelSerializers
 from .permissions import IsAdminOrReadOnly
 
+def build_news_text(data):
+    return (
+        "📰 <b>YANGILIK</b>\n"
+        "━━━━━━━━━━━━━━\n\n"
+        f"<b>{data['title']}</b>\n\n"
+        f"{data['description']}\n\n"
+        "━━━━━━━━━━━━━━\n"
+        "📌 <i>Gulomte Mahalla</i>"
+    )
+
+
 async def send_message(chat_ids, data):
-    async with Bot(token=config('TOKEN')) as bot:
+    async with Bot(token=config("TOKEN")) as bot:
+
+        text = build_news_text(data)
+
         async for chat_id in chat_ids.aiterator():
-            await bot.send_message(
-                chat_id=chat_id,
-                text=f"{data['title']}\n\n{data['description']}",
-            )
+            try:
+                # 1. Avval yangilik matni
+                await bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode=ParseMode.HTML,
+                )
+
+                # 2. Keyin fayl, agar mavjud bo'lsa
+                file = data.get("file")
+
+                if file:
+                    file.seek(0)
+
+                    await bot.send_document(
+                        chat_id=chat_id,
+                        document=file,
+                    )
+
+            except Exception as exc:
+                print(f"❌ Failed to send to {chat_id}: {exc}")
 
 class NewsViewSet(viewsets.ModelViewSet):
     """
@@ -43,6 +75,7 @@ class NewsViewSet(viewsets.ModelViewSet):
         asyncio.run(
             send_message(chat_ids, validated_data)
         )
+        serializers.save()
 
         return Response(serializers.data)
 

@@ -5,8 +5,11 @@ class News(models.Model):
     title = models.CharField(max_length=255, verbose_name="Title")
     description = models.TextField(verbose_name="Description")
     
-    file = models.FileField(null=True,blank=True)
-    # send_time = models.DateTimeField()
+    file = models.FileField(
+        null=True,
+        blank=True,
+        upload_to='%Y-%m-%d/'
+    )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
