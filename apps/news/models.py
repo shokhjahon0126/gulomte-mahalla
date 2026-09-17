@@ -1,4 +1,17 @@
+import os
+
 from django.db import models
+from uuid import uuid4
+
+
+def upload_file_name(self, filename):
+    file_type = os.path.splitext(filename)[1][1:] 
+
+    new_filename = f"{uuid4().hex}.{file_type}"
+    return os.path.join(
+        'uploads/',
+        new_filename
+    )
 
 
 class News(models.Model):
@@ -8,7 +21,7 @@ class News(models.Model):
     file = models.FileField(
         null=True,
         blank=True,
-        upload_to='%Y-%m-%d/'
+        upload_to=upload_file_name
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")

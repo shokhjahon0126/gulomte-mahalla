@@ -7,6 +7,13 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+# Source - https://stackoverflow.com/a/5518073
+# Posted by Micah Carrick, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-09-17, License - CC BY-SA 4.0
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -34,4 +41,4 @@ urlpatterns = [
     path('profile/', TemplateView.as_view(template_name='profile/detail.html'), name='web-profile-detail'),
     path('profile/edit/', TemplateView.as_view(template_name='profile/edit.html'), name='web-profile-edit'),
     path('profile/change-password/', TemplateView.as_view(template_name='profile/change_password.html'), name='web-profile-change-password'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
