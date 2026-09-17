@@ -20,6 +20,7 @@ urlpatterns = [
     # Existing Backend REST APIs (Do Not Touch)
     path('User/', include('apps.users.urls')),
     path('News/', include('apps.news.urls')),
+    path('bot/', include('apps.bot.urls')),
 
     # drf-spectacular documentation URLs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

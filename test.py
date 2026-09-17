@@ -1,4 +1,4 @@
 import os 
 
 
-print(os.path.split('users.png'))[1]
+print(os.path.split('users.png')[1])

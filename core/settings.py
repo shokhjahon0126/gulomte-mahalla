@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.users',
     'apps.news',
+    'apps.bot',
 ]
 
 AUTH_USER_MODEL = 'users.User'

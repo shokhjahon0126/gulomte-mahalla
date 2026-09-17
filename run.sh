@@ -1,1 +1,2 @@
-python main.py & python manage.py runserver
+python main.py &
+python manage.py runserver

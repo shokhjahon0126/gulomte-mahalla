@@ -1,5 +1,5 @@
 from datetime import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from telegram import Bot
@@ -77,7 +77,7 @@ class NewsViewSet(viewsets.ModelViewSet):
         )
         serializers.save()
 
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_201_CREATED)
 
 
 class TelegramChannelViewsets(viewsets.ModelViewSet):
