@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.users',
     'apps.news',
-    'apps.bot',
+    # 'apps.bot',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -158,3 +158,13 @@ MAILERS = {
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+
+from decouple import config
+
+
+TELEGRAM_BOT_TOKEN = config("TOKEN")
+
+TELEGRAM_WEBHOOK_SECRET = config(
+    "TELEGRAM_WEBHOOK_SECRET"
+)

@@ -86,3 +86,68 @@ class TelegramChannelViewsets(viewsets.ModelViewSet):
     serializer_class = TelegramChannelSerializers
     queryset = TelegramChannel.objects.all()
 
+
+
+
+import json
+import asyncio
+
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from telegram import Update
+
+from .telegram import application
+
+
+_initialized = False
+_lock = asyncio.Lock()
+
+
+async def initialize_application():
+    global _initialized
+
+    if _initialized:
+        return
+
+    async with _lock:
+        if _initialized:
+            return
+
+        await application.initialize()
+
+        _initialized = True
+
+
+@csrf_exempt
+async def telegram_webhook(request):
+
+    if request.method != "POST":
+        return JsonResponse(
+            {"detail": "Method not allowed"},
+            status=405,
+        )
+
+    secret = request.headers.get(
+        "X-Telegram-Bot-Api-Secret-Token"
+    )
+
+    if secret != settings.TELEGRAM_WEBHOOK_SECRET:
+        return JsonResponse(
+            {"detail": "Forbidden"},
+            status=403,
+        )
+
+    await initialize_application()
+
+    data = json.loads(request.body)
+
+    update = Update.de_json(
+        data=data,
+        bot=application.bot,
+    )
+
+    await application.process_update(update)
+
+    return JsonResponse({"ok": True})
