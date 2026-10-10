@@ -84,7 +84,11 @@ async def on_my_chat_member(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 
 def main() -> None:
-    token = config("TOKEN")
+    token = config("TOKEN", default="")
+    if not token:
+        logger.error("❌ TOKEN topilmadi! Iltimos, .env faylida TOKEN=... ni belgilang.")
+        return
+
     logger.info("🚀 Telegram bot ishga tushmoqda...")
 
     application = Application.builder().token(token).build()

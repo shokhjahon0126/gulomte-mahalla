@@ -167,10 +167,11 @@ MEDIA_URL = '/media/'
 from decouple import config
 
 
-TELEGRAM_BOT_TOKEN = config("TOKEN")
+TELEGRAM_BOT_TOKEN = config("TOKEN", default="")
 
 TELEGRAM_WEBHOOK_SECRET = config(
-    "TELEGRAM_WEBHOOK_SECRET"
+    "TELEGRAM_WEBHOOK_SECRET",
+    default=""
 )
 
 # Celery settings
