@@ -42,6 +42,16 @@
                     class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"></textarea>
             </div>
 
+            <!-- Send Date -->
+            <div>
+                <label for="news-send-date-input" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                    Telegramga Yuborish Vaqti (Send Date) <span class="text-gray-400 font-normal lowercase">(ixtiyoriy)</span>
+                </label>
+                <input type="datetime-local" id="news-send-date-input" name="send_date"
+                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                <p class="text-[11px] text-gray-400 mt-1">Belgilangan kelajakdagi vaqtda yangilik avtomatik tarzda Telegram kanallarga yuboriladi.</p>
+            </div>
+
             <!-- Error Container -->
             <div id="form-error" class="hidden p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-medium"></div>
 
@@ -73,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const titleInput = document.getElementById('news-title-input');
     const descInput = document.getElementById('news-desc-input');
+    const sendDateInput = document.getElementById('news-send-date-input');
     const formHeading = document.getElementById('form-heading');
     const formSubheading = document.getElementById('form-subheading');
     const submitBtn = document.getElementById('submit-news-btn');
@@ -89,6 +100,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             const item = await API.news.getById(newsId);
             titleInput.value = item.title || '';
             descInput.value = item.description || '';
+            if (item.send_date) {
+                const d = new Date(item.send_date);
+                const localIso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                sendDateInput.value = localIso;
+            }
         } catch (e) {
             Toast.error("Yangilik ma'lumotlarini yuklashda xatolik!");
             setTimeout(() => window.location.href = '/news/', 1500);
@@ -104,9 +120,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         btnSpinner.classList.remove('hidden');
         submitBtn.disabled = true;
 
+        const sendDateVal = sendDateInput.value ? new Date(sendDateInput.value).toISOString() : null;
+
         const payload = {
             title: titleInput.value.trim(),
             description: descInput.value.trim(),
+            send_date: sendDateVal,
         };
 
         try {

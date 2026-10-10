@@ -39,6 +39,7 @@ urlpatterns = [
     path('news/create/', TemplateView.as_view(template_name='news/form.html'), name='web-news-create'),
     path('news/<int:pk>/', TemplateView.as_view(template_name='news/detail.html'), name='web-news-detail'),
     path('news/<int:pk>/edit/', TemplateView.as_view(template_name='news/form.html'), name='web-news-edit'),
+    path('channels/', TemplateView.as_view(template_name='channels/list.html'), name='web-channels-list'),
     path('profile/', TemplateView.as_view(template_name='profile/detail.html'), name='web-profile-detail'),
     path('profile/edit/', TemplateView.as_view(template_name='profile/edit.html'), name='web-profile-edit'),
     path('profile/change-password/', TemplateView.as_view(template_name='profile/change_password.html'), name='web-profile-change-password'),

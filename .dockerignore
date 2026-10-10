@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local databases
+*.sqlite3
+db.sqlite3
+db.sqlite3-journal
+
+# Environment variables & secrets
+.env
+.env.local
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker configuration files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Temporary and test files
+test.py
+*.log
+logs/
+
+# Media uploads (managed via volumes)
+media/

@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+
+{% block title %}Telegram Kanallar - G'ulomte Mahalla{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Telegram Kanallari</h1>
+            <p class="text-xs text-gray-500">Mahalla yangiliklari avtomatik tarqatiladigan Telegram kanallari va guruhlarini boshqarish</p>
+        </div>
+
+        <!-- Add Channel Button (Admin Only) -->
+        <button type="button" onclick="openAddChannelModal()" class="admin-only hidden px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-md shadow-sky-500/20 transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-plus text-sm"></i>
+            <span>Yangi Kanal Qo'shish</span>
+        </button>
+    </div>
+
+    <!-- Instruction / Helper Banner -->
+    <div class="bg-gradient-to-r from-sky-50 via-indigo-50 to-blue-50 border border-sky-100/80 rounded-2xl p-5 shadow-xs">
+        <div class="flex items-start space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 text-lg shadow-sm shadow-sky-600/30">
+                <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div class="space-y-2 text-xs">
+                <h4 class="font-bold text-gray-900 text-sm">Telegram kanalni tizimga qanday ulash kerak?</h4>
+                <ol class="list-decimal list-inside space-y-1 text-gray-600 leading-relaxed font-medium">
+                    <li>Mahalliy botni kanalingizga <strong class="text-gray-900">Administrator</strong> sifatida qo'shing va xabar yozish ruxsatini bering.</li>
+                    <li>Quyidagi <strong class="text-gray-900">"Yangi Kanal Qo'shish"</strong> tugmasini bosib, kanal nomi va uning <strong class="text-gray-900">@username</strong>'ini kiriting.</li>
+                    <li>Kanalda bot orqali yoki admin tomonidan bitta yangi xabar e'lon qilingach, bot avtomatik ravishda <strong class="text-gray-900">Chat ID</strong>'ni oladi va holat <strong class="text-emerald-600">"Ulangan"</strong> ga o'zgaradi.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        <div class="relative w-full sm:w-80">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </div>
+            <input type="text" id="channel-search-input" placeholder="Kanallar ichidan qidirish..."
+                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+        </div>
+
+        <div class="flex items-center space-x-2 self-end sm:self-auto text-xs text-gray-500">
+            <i class="fa-brands fa-telegram text-sky-500"></i>
+            <span>Jami: <strong id="total-channels-count" class="text-gray-900">0</strong> ta kanal</span>
+        </div>
+
+    </div>
+
+    <!-- Desktop Channels Table -->
+    <div class="hidden md:block bg-white rounded-3xl border border-gray-200/80 shadow-xs overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50/70 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <th class="py-3.5 px-6">Kanal Nomi</th>
+                    <th class="py-3.5 px-6">Username / Havola</th>
+                    <th class="py-3.5 px-6">Holati</th>
+                    <th class="py-3.5 px-6 text-right">Amallar</th>
+                </tr>
+            </thead>
+            <tbody id="channels-table-body" class="divide-y divide-gray-100 text-sm">
+                <!-- Skeleton Loading -->
+                <tr>
+                    <td colspan="4" class="py-12 text-center text-gray-400">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl text-sky-600 mb-2"></i>
+                        <p class="text-xs">Kanallar yuklanmoqda...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Channels Cards Grid -->
+    <div id="channels-cards-container" class="md:hidden space-y-4">
+        <!-- Mobile cards rendered here -->
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="channels-empty-state" class="hidden bg-white rounded-3xl border border-gray-200/80 shadow-xs p-12 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fa-brands fa-telegram"></i>
+        </div>
+        <h3 class="text-base font-bold text-gray-900">Kanallar mavjud emas</h3>
+        <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Hozircha tizimga birorta ham Telegram kanal biriktirilmagan.</p>
+        <button type="button" onclick="openAddChannelModal()" class="admin-only hidden inline-flex items-center space-x-2 px-4 py-2 mt-4 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl transition">
+            <i class="fa-solid fa-plus"></i>
+            <span>Birinchi kanalni qo'shish</span>
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Standalone resilient API client for channels (bypasses any browser cache issues)
+const ChannelAPI = {
+    async request(endpoint, options = {}) {
+        if (typeof API !== 'undefined' && typeof API.request === 'function') {
+            return await API.request(endpoint, options);
+        }
+
+        const token = (typeof API !== 'undefined' && typeof API.getAccessToken === 'function')
+            ? API.getAccessToken()
+            : (localStorage.getItem('mahalla_access_token') || sessionStorage.getItem('mahalla_access_token'));
+
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(endpoint, { ...options, headers });
+        let data = null;
+        try {
+            data = await res.json();
+        } catch (_) {}
+
+        if (!res.ok) {
+            let errorMsg = `Server xatosi: ${res.status}`;
+            if (data) {
+                if (typeof data === 'string') errorMsg = data;
+                else if (data.detail) errorMsg = data.detail;
+                else if (typeof data === 'object') {
+                    errorMsg = Object.entries(data)
+                        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+                        .join('\n');
+                }
+            }
+            throw new Error(errorMsg);
+        }
+        return data;
+    },
+
+    async getAll() {
+        if (typeof API !== 'undefined' && API.channels && typeof API.channels.getAll === 'function') {
+            return await API.channels.getAll();
+        }
+        return await this.request('/News/channel/', { method: 'GET' });
+    },
+
+    async create(data) {
+        if (typeof API !== 'undefined' && API.channels && typeof API.channels.create === 'function') {
+            return await API.channels.create(data);
+        }
+        return await this.request('/News/channel/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    },
+
+    async delete(id) {
+        if (typeof API !== 'undefined' && API.channels && typeof API.channels.delete === 'function') {
+            return await API.channels.delete(id);
+        }
+        return await this.request(`/News/channel/${id}/`, { method: 'DELETE' });
+    }
+};
+
+// Also ensure API.channels is populated globally if missing
+if (typeof API !== 'undefined' && !API.channels) {
+    API.channels = ChannelAPI;
+}
+
+let allChannels = [];
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await fetchChannelsList();
+
+    const searchInput = document.getElementById('channel-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const filtered = allChannels.filter(c => 
+                (c.title && c.title.toLowerCase().includes(query)) ||
+                (c.username && c.username.toLowerCase().includes(query))
+            );
+            renderChannels(filtered);
+        });
+    }
+});
+
+async function fetchChannelsList() {
+    try {
+        allChannels = await ChannelAPI.getAll();
+        renderChannels(allChannels);
+    } catch (err) {
+        Toast.error("Kanallarni yuklashda xatolik yuz berdi!");
+        console.error(err);
+    }
+}
+
+function renderChannels(list) {
+    const tbody = document.getElementById('channels-table-body');
+    const cardsContainer = document.getElementById('channels-cards-container');
+    const emptyState = document.getElementById('channels-empty-state');
+    const countEl = document.getElementById('total-channels-count');
+
+    if (countEl) countEl.textContent = list.length;
+
+    if (!list || list.length === 0) {
+        if (tbody) tbody.innerHTML = '';
+        if (cardsContainer) cardsContainer.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+
+    const currentUser = API.getCurrentUser();
+    const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.is_staff);
+
+    // Desktop Table Render
+    if (tbody) {
+        tbody.innerHTML = list.map(item => {
+            const cleanUsername = (item.username || '').replace(/^@/, '');
+            const isConnected = !!item.chat_id || (item.status && item.status.includes('Connected') && !item.status.includes('Not'));
+            const statusBadge = isConnected
+                ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                     <i class="fa-solid fa-circle-check mr-1.5 text-emerald-500"></i> Ulangan
+                   </span>`
+                : `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60" title="Bot kanalga xabar yozilishini kutmoqda">
+                     <i class="fa-solid fa-clock mr-1.5 text-amber-500"></i> Kutilmoqda
+                   </span>`;
+
+            return `
+                <tr class="hover:bg-gray-50/70 transition">
+                    <td class="py-4 px-6 font-bold text-gray-900">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs">
+                                <i class="fa-brands fa-telegram"></i>
+                            </div>
+                            <span>${escapeHtml(item.title)}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-xs whitespace-nowrap">
+                        <a href="https://t.me/${cleanUsername}" target="_blank" rel="noopener noreferrer" 
+                           class="text-sky-600 hover:text-sky-800 font-semibold inline-flex items-center space-x-1 hover:underline">
+                            <span>@${escapeHtml(cleanUsername)}</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    </td>
+                    <td class="py-4 px-6 whitespace-nowrap">${statusBadge}</td>
+                    <td class="py-4 px-6 text-right whitespace-nowrap">
+                        ${isAdmin ? `
+                            <button type="button" onclick="confirmDeleteChannel(${item.id}, '${escapeHtml(item.title)}')" 
+                                    class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg transition inline-flex items-center space-x-1">
+                                <i class="fa-solid fa-trash-can text-[11px]"></i>
+                                <span>O'chirish</span>
+                            </button>
+                        ` : '<span class="text-xs text-gray-400">-</span>'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Mobile Cards Render
+    if (cardsContainer) {
+        cardsContainer.innerHTML = list.map(item => {
+            const cleanUsername = (item.username || '').replace(/^@/, '');
+            const isConnected = !!item.chat_id || (item.status && item.status.includes('Connected') && !item.status.includes('Not'));
+            const statusBadge = isConnected
+                ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700">
+                     <i class="fa-solid fa-circle-check mr-1 text-emerald-500"></i> Ulangan
+                   </span>`
+                : `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700">
+                     <i class="fa-solid fa-clock mr-1 text-amber-500"></i> Kutilmoqda
+                   </span>`;
+
+            return `
+                <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-xs space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-brands fa-telegram text-sky-600 text-base"></i>
+                            <h3 class="text-sm font-bold text-gray-900">${escapeHtml(item.title)}</h3>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="text-xs space-y-1 pt-2 border-t border-gray-50">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Username:</span>
+                            <a href="https://t.me/${cleanUsername}" target="_blank" class="text-sky-600 font-semibold hover:underline">@${escapeHtml(cleanUsername)}</a>
+                        </div>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="pt-3 border-t border-gray-100 flex items-center justify-end">
+                            <button type="button" onclick="confirmDeleteChannel(${item.id}, '${escapeHtml(item.title)}')" class="px-3 py-1.5 bg-rose-50 text-rose-700 text-xs font-semibold rounded-lg">
+                                O'chirish
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+function openAddChannelModal() {
+    const html = `
+        <form id="add-channel-form" class="space-y-4">
+            <div>
+                <label for="new-channel-title" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Kanal Nomi (Title)
+                </label>
+                <input type="text" id="new-channel-title" required placeholder="Masalan: G'ulomte Mahalla Rasmiy"
+                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+            </div>
+
+            <div>
+                <label for="new-channel-username" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                    Telegram Username
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 text-xs font-bold">@</span>
+                    <input type="text" id="new-channel-username" required placeholder="gulomte_mahalla"
+                        class="w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition">
+                </div>
+                <p class="text-[11px] text-gray-400 mt-1">@ belgisiz yoki @ belgisi bilan kanal username'ini kiriting</p>
+            </div>
+
+            <div id="add-channel-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-medium"></div>
+        </form>
+    `;
+
+    const footerHtml = `
+        <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50">Bekor qilish</button>
+        <button type="button" id="save-channel-btn" onclick="submitAddChannel()" class="px-4 py-2 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-md shadow-sky-500/20">Saqlash</button>
+    `;
+
+    openModal("Yangi Telegram Kanal Qo'shish", html, footerHtml);
+}
+
+async function submitAddChannel() {
+    const titleInput = document.getElementById('new-channel-title');
+    const usernameInput = document.getElementById('new-channel-username');
+    const errorBox = document.getElementById('add-channel-error');
+    const saveBtn = document.getElementById('save-channel-btn');
+
+    if (!titleInput || !usernameInput) return;
+
+    const title = titleInput.value.trim();
+    let username = usernameInput.value.trim();
+
+    if (!title || !username) {
+        if (errorBox) {
+            errorBox.textContent = "Iltimos, barcha maydonlarni to'ldiring!";
+            errorBox.classList.remove('hidden');
+        }
+        return;
+    }
+
+    // Remove leading @ if present for consistent storage
+    if (username.startsWith('@')) {
+        username = username.substring(1);
+    }
+
+    if (errorBox) errorBox.classList.add('hidden');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saqlanmoqda...";
+    }
+
+    try {
+        await ChannelAPI.create({
+            title: title,
+            username: username
+        });
+
+        Toast.success("Kanal muvaffaqiyatli qo'shildi!");
+        closeModal();
+        await fetchChannelsList();
+    } catch (err) {
+        if (errorBox) {
+            errorBox.textContent = err.message || "Kanalni qo'shishda xatolik yuz berdi!";
+            errorBox.classList.remove('hidden');
+        }
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = "Saqlash";
+        }
+    }
+}
+
+function confirmDeleteChannel(id, title) {
+    const html = `
+        <div class="text-center space-y-4 p-2">
+            <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-gray-900">Bu kanalni o'chirishni xohlaysizmi?</h4>
+                <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">"${title}" nomli kanal ro'yxatdan o'chiriladi va unga yangiliklar yuborilmaydi.</p>
+            </div>
+        </div>
+    `;
+
+    const footerHtml = `
+        <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50">Bekor qilish</button>
+        <button type="button" id="channel-confirm-delete-btn" onclick="executeDeleteChannel(${id})" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-md shadow-rose-500/20">O'chirish</button>
+    `;
+
+    openModal("Kanalni O'chirish", html, footerHtml);
+}
+
+async function executeDeleteChannel(id) {
+    const btn = document.getElementById('channel-confirm-delete-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "O'chirilmoqda...";
+    }
+
+    try {
+        await ChannelAPI.delete(id);
+        Toast.success("Kanal muvaffaqiyatli o'chirildi!");
+        closeModal();
+        await fetchChannelsList();
+    } catch (err) {
+        Toast.error(err.message || "O'chirishda xatolik yuz berdi!");
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "O'chirish";
+        }
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+}
+</script>
+{% endblock %}

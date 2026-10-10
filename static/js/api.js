@@ -239,7 +239,33 @@ const API = (function () {
             },
         },
 
+        // Telegram Channels API
+        channels: {
+            getAll: async () => {
+                return await request('/News/channel/', { method: 'GET' });
+            },
+            getById: async (id) => {
+                return await request(`/News/channel/${id}/`, { method: 'GET' });
+            },
+            create: async (data) => {
+                return await request('/News/channel/', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                });
+            },
+            update: async (id, data) => {
+                return await request(`/News/channel/${id}/`, {
+                    method: 'PATCH',
+                    body: JSON.stringify(data),
+                });
+            },
+            delete: async (id) => {
+                return await request(`/News/channel/${id}/`, { method: 'DELETE' });
+            },
+        },
+
         // Helpers
+        request,
         getAccessToken,
         getRefreshToken,
         getCurrentUser,

@@ -1,29 +1,22 @@
-import os
-
 from django.db import models
-from uuid import uuid4
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
-
-def upload_file_name(self, filename):
-    file_type = os.path.splitext(filename)[1][1:] 
-
-    new_filename = f"{uuid4().hex}.{file_type}"
-    return os.path.join(
-        'uploads/',
-        new_filename
-    )
-
+def validate_future_date(value):
+    if value and value < timezone.now():
+        raise ValidationError("Yuborish vaqti kelajakda bo'lishi kerak! (The date and time must be in the future)")
 
 class News(models.Model):
     title = models.CharField(max_length=255, verbose_name="Title")
     description = models.TextField(verbose_name="Description")
     
-    file = models.FileField(
-        null=True,
-        blank=True,
-        upload_to=upload_file_name
+    send_date = models.DateTimeField(
+        verbose_name="Send Date", 
+        validators=[validate_future_date], 
+        null=True, blank=True,
+        help_text="Qaysi vaqtda yuborilishini belgilang"
     )
-
+ 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
@@ -34,6 +27,20 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # Schedule the task if send_date is set and it's a new news or send_date is updated
+        # Here we just schedule it simply.
+        if self.send_date:
+            from .tasks import send_news_to_telegram
+            send_news_to_telegram.apply_async(
+                args=[self.id, self.title, self.description],
+                eta=self.send_date
+            )
+
 
 
 class TelegramChannel(models.Model):
@@ -49,4 +56,10 @@ class TelegramChannel(models.Model):
         
     def __str__(self):
         return self.title
+
+    @property
+    def status(self):
+        if self.chat_id:
+            return "✅ Connected"
+        return "❌ Not Connected"
 

@@ -30,9 +30,16 @@
             <div id="public-detail-content" class="hidden space-y-6">
                 
                 <div class="space-y-3 pb-6 border-b border-gray-100">
-                    <div class="flex items-center space-x-3 text-xs text-indigo-600 font-semibold">
-                        <span class="px-2.5 py-1 bg-indigo-50 rounded-lg">Rasmiy Yangilik</span>
-                        <span id="public-article-date" class="text-gray-500 font-medium">...</span>
+                    <div class="flex flex-wrap items-center gap-3 text-xs font-semibold">
+                        <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-lg">Rasmiy Yangilik</span>
+                        <span class="text-gray-500 font-medium flex items-center">
+                            <i class="fa-regular fa-calendar mr-1.5 text-gray-400"></i>
+                            <span id="public-article-date">...</span>
+                        </span>
+                        <span id="public-send-date-badge" class="hidden px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg items-center">
+                            <i class="fa-brands fa-telegram mr-1.5"></i>
+                            <span id="public-send-date-text"></span>
+                        </span>
                     </div>
 
                     <h1 id="public-article-title" class="text-2xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
@@ -86,6 +93,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (article.created_at) {
             document.getElementById('public-article-date').textContent = DateUtils.formatDateTime(article.created_at);
+        }
+
+        if (article.send_date) {
+            const sendBadge = document.getElementById('public-send-date-badge');
+            const sendText = document.getElementById('public-send-date-text');
+            if (sendBadge && sendText) {
+                sendText.textContent = `Yuborish: ${DateUtils.formatDateTime(article.send_date)}`;
+                sendBadge.classList.remove('hidden');
+                sendBadge.classList.add('inline-flex');
+            }
         }
 
     } catch (err) {

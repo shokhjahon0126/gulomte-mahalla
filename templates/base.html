@@ -64,10 +64,10 @@
 
     <!-- Static JavaScript Libraries -->
     {% load static %}
-    <script src="{% static 'js/date-utils.js' %}"></script>
-    <script src="{% static 'js/api.js' %}"></script>
-    <script src="{% static 'js/alert.js' %}"></script>
-    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/date-utils.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/api.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/alert.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/auth.js' %}?v={% now 'U' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>
