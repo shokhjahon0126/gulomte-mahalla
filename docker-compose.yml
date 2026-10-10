@@ -3,6 +3,8 @@ services:
   db:
     image: postgres:15-alpine
     container_name: mahalla_db
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME:-mahalla}
       POSTGRES_USER: ${DB_USER:-postgres}
